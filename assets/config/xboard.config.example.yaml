@@ -2,6 +2,12 @@
 # 复制此文件为 xboard.config.yaml 并修改相应配置
 
 xboard:
+  # 面板类型选择（重要！）
+  # xboard: 使用 XBoard 面板系统和对应SDK
+  # v2board: 使用 V2Board 面板系统和对应SDK
+  # 根据你使用的面板类型选择，系统会自动加载对应的SDK
+  panel_type: xboard
+  
   # 后端提供商类型
   # 可以是任意字符串，只要远程配置 JSON 的 panels 对象中有对应的键名
   # 例如: Flclash, v2word, wujie, mihomo, 或自定义的任何名称

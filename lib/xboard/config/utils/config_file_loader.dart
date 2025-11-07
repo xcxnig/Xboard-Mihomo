@@ -39,6 +39,7 @@ class ConfigFileLoader {
       final xboardConfig = configMap['xboard'] as Map<String, dynamic>? ?? {};
       
       // 提取配置参数
+      final panelType = xboardConfig['panel_type'] as String? ?? 'xboard';
       final provider = xboardConfig['provider'] as String? ?? 'Flclash';
       final remoteConfigJson = xboardConfig['remote_config'] as Map<String, dynamic>? ?? {};
       final subscriptionJson = xboardConfig['subscription'] as Map<String, dynamic>? ?? {};
@@ -46,6 +47,7 @@ class ConfigFileLoader {
       
       // 构建配置对象
       return ConfigSettings(
+        panelType: panelType,
         currentProvider: provider,
         remoteConfig: _parseRemoteConfig(remoteConfigJson),
         subscription: _parseSubscriptionSettings(subscriptionJson),

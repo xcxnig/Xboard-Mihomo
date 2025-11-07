@@ -1,0 +1,36 @@
+name: flutter_v2board_sdk
+description: V2Board API SDK for Flutter - Complete API wrapper for V2Board panel system
+version: 1.0.0
+repository: https://github.com/hakimi-x/flutter_v2board_sdk
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # HTTP 请求
+  dio: ^5.4.0
+  
+  # JSON 序列化
+  json_annotation: ^4.9.0
+  freezed_annotation: ^2.4.1
+  
+  # 状态管理和依赖注入
+  riverpod: ^2.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # 代码生成器
+  build_runner: ^2.4.0
+  json_serializable: ^6.7.1
+  freezed: ^2.5.1
+  
+  # 代码规范
+  flutter_lints: ^3.0.0
+
+flutter:

@@ -2,12 +2,14 @@
 /// 
 /// 包含模块的各种配置参数
 class ConfigSettings {
+  final String panelType;  // 面板类型：xboard 或 v2board
   final String currentProvider;
   final RemoteConfigSettings remoteConfig;
   final SubscriptionSettings subscription;
   final LogSettings log;
 
   const ConfigSettings({
+    this.panelType = 'xboard',  // 默认使用 XBoard
     this.currentProvider = 'Flclash',
     this.remoteConfig = const RemoteConfigSettings(),
     this.subscription = const SubscriptionSettings(),
@@ -17,6 +19,7 @@ class ConfigSettings {
   /// 从JSON创建配置
   factory ConfigSettings.fromJson(Map<String, dynamic> json) {
     return ConfigSettings(
+      panelType: json['panelType'] as String? ?? 'xboard',
       currentProvider: json['currentProvider'] as String? ?? 'Flclash',
       remoteConfig: RemoteConfigSettings.fromJson(
         json['remoteConfig'] as Map<String, dynamic>? ?? {}
@@ -33,6 +36,7 @@ class ConfigSettings {
   /// 转换为JSON
   Map<String, dynamic> toJson() {
     return {
+      'panelType': panelType,
       'currentProvider': currentProvider,
       'remoteConfig': remoteConfig.toJson(),
       'subscription': subscription.toJson(),
@@ -63,7 +67,7 @@ class ConfigSettings {
 
   @override
   String toString() {
-    return 'ConfigSettings(provider: $currentProvider, subscription: $subscription)';
+    return 'ConfigSettings(panelType: $panelType, provider: $currentProvider, subscription: $subscription)';
   }
 }
 
