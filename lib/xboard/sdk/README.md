@@ -1,380 +1,312 @@
-# XBoard Domain Service - 中间层架构说明
+# Panel SDK 统一接口
 
-## 📖 概述
+多面板 SDK 支持，可在 XBoard 和 V2Board 之间无缝切换。
 
-`xboard/domain_service` 是 FlClash 应用中 XBoard 功能的统一访问层（Facade 模式），它封装了底层的 `flutter_xboard_sdk`，为上层业务代码提供简洁、统一的 API。
+## 特性
 
-## 🎯 设计目标
+✅ **统一接口**: 两种面板使用相同的 API 调用方式  
+✅ **自动切换**: 根据配置文件自动选择正确的 SDK  
+✅ **类型安全**: 完整的类型支持和错误处理  
+✅ **简单易用**: 全局单例访问，无需手动管理实例  
 
-1. **单一入口**：所有 XBoard 功能只通过 `XBoardDomainService` 访问
-2. **简化调用**：隐藏 SDK 的复杂性，提供开箱即用的便捷方法
-3. **类型安全**：使用强类型接口，减少运行时错误
-4. **易于维护**：集中管理 SDK 调用，方便未来升级和修改
-5. **向后兼容**：通过类型别名保持与旧代码的兼容性
+## 支持的面板类型
 
-## 📂 目录结构
+- **XBoard**: 完整支持
+- **V2Board**: 完整支持
 
-```
-lib/xboard/domain_service/
-├── domain_service.dart          # 主入口文件 + XBoardDomainService 类
-├── src/
-│   ├── xboard_client.dart       # SDK 客户端封装（底层）
-│   ├── config/
-│   │   └── service_configs.dart # 服务配置
-│   ├── utils/
-│   │   └── subscription_url_transformer.dart  # 订阅链接转换工具
-│   └── exceptions/
-│       ├── domain_exceptions.dart            # 领域异常
-│       └── domain_service_exceptions.dart    # 服务异常
-└── README.md                    # 本文档
-```
+## 快速开始
 
-## 🏗️ 架构层次
+### 1. 配置面板类型
 
-```
-┌─────────────────────────────────────────┐
-│   业务层 (Features)                      │
-│   - auth/                                │
-│   - payment/                             │
-│   - invite/                              │
-│   - subscription/                        │
-└─────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────────┐
-│   中间层 (Domain Service)                │  ← 你在这里！
-│   XBoardDomainService                   │
-│   - 统一 API                             │
-│   - 便捷方法                             │
-│   - 错误处理                             │
-└─────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────────┐
-│   客户端层 (Client)                      │
-│   XBoardClient                          │
-│   - SDK 生命周期管理                     │
-│   - 多域名竞速                           │
-└─────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────────┐
-│   SDK 层 (flutter_xboard_sdk)           │
-│   - HTTP 请求                            │
-│   - Token 管理                           │
-│   - API 定义                             │
-└─────────────────────────────────────────┘
+在 `assets/config/xboard.config.yaml` 中设置：
+
+```yaml
+xboard:
+  # 选择面板类型
+  panel_type: xboard  # 或 v2board
+  
+  # 其他配置...
 ```
 
-## 📚 核心组件
-
-### 1. XBoardDomainService
-
-**职责**：
-- 提供统一的静态方法访问 XBoard 功能
-- 封装 SDK 调用细节
-- 统一错误处理
-- 简化常见操作
-
-**关键方法**：
+### 2. 初始化 SDK
 
 ```dart
-// 初始化
-await XBoardDomainService.initialize(null);
+import 'package:xboard_mihomo/xboard/sdk/panel_sdk.dart';
 
-// 认证
-await XBoardDomainService.login(email, password);
-await XBoardDomainService.logout();
+// 从配置文件自动初始化
+await PanelSDKManager.initFromConfig();
 
-// 用户信息
-final userInfo = await XBoardDomainService.getUserInfo();
-
-// 套餐和订阅
-final plans = await XBoardDomainService.getPlans();
-final subscription = await XBoardDomainService.getSubscription();
-
-// 订单
-final tradeNo = await XBoardDomainService.createOrder(request);
-final orders = await XBoardDomainService.getOrders();
-
-// 支付
-final methods = await XBoardDomainService.getPaymentMethods();
-final result = await XBoardDomainService.submitPayment(request);
-
-// 邀请佣金
-final inviteInfo = await XBoardDomainService.getInviteInfo();
-await XBoardDomainService.withdrawCommission(amount: 100, withdrawAccount: 'xxx');
-
-// 工单
-final tickets = await XBoardDomainService.getTickets();
-await XBoardDomainService.createTicket(subject: 'Help', message: '...', level: 1);
-
-// 公告
-final notices = await XBoardDomainService.getNotices();
-```
-
-### 2. XBoardClient
-
-**职责**：
-- SDK 实例管理
-- 多域名竞速选择
-- SDK 初始化配置
-
-**使用场景**：
-- 通常不需要直接调用
-- 由 `XBoardDomainService` 内部使用
-
-### 3. 类型别名（向后兼容）
-
-为了保持与旧代码的兼容性，提供了以下类型别名：
-
-```dart
-typedef UserInfoData = UserInfo;
-typedef SubscriptionData = SubscriptionInfo;
-typedef PlanData = Plan;
-typedef OrderData = Order;
-typedef PaymentMethodData = PaymentMethod;
-typedef NoticeData = Notice;
-typedef TicketData = Ticket;
-// ... 等等
-```
-
-## 🔧 使用指南
-
-### ✅ 正确用法
-
-```dart
-// 1. 应用启动时初始化（只需一次）
-await XBoardDomainService.initialize(null);
-
-// 2. 在任何地方直接调用
-final userInfo = await XBoardDomainService.getUserInfo();
-final plans = await XBoardDomainService.getPlans();
-
-// 3. 使用请求模型
-final orderRequest = CreateOrderRequestData(
-  planId: 1,
-  period: 'month_price',
-  couponCode: 'DISCOUNT2024',
+// 或手动指定
+await PanelSDKManager.init(
+  panelType: 'xboard',  // 或 'v2board'
+  baseUrl: 'https://your-panel.com',
 );
-final tradeNo = await XBoardDomainService.createOrder(orderRequest);
 ```
 
-### ❌ 错误用法
+### 3. 使用 SDK
 
 ```dart
-// ❌ 不要直接访问 SDK
-final sdk = XBoardClient.instance.sdk;
-final userInfo = await sdk.userInfo.getUserInfo();
+// 登录
+final success = await PanelSDKManager.instance.login(
+  email: 'user@example.com',
+  password: 'password',
+);
 
-// ❌ 不要绕过 DomainService
-final client = XBoardClient.instance;
-await client.sdk.login.login(email, password);
+if (success) {
+  print('登录成功');
+}
+
+// 获取用户信息
+final userInfo = await PanelSDKManager.instance.getUserInfo();
+print('用户邮箱: ${userInfo?['email']}');
+
+// 获取订阅链接
+final subUrl = await PanelSDKManager.instance.getSubscriptionUrl();
+print('订阅链接: $subUrl');
+
+// 获取套餐列表
+final plans = await PanelSDKManager.instance.getPlans();
+for (var plan in plans) {
+  print('套餐: ${plan['name']}');
+}
+
+// 登出
+await PanelSDKManager.instance.logout();
 ```
 
-## 🔄 数据流
+## API 参考
 
-```
-用户操作
-  ↓
-UI Layer (页面/组件)
-  ↓
-Provider Layer (状态管理)
-  ↓
-XBoardDomainService (中间层) ← 统一入口
-  ↓
-XBoardClient (客户端封装)
-  ↓
-XBoardSDK (底层 SDK)
-  ↓
-HTTP API (后端服务)
-```
+### PanelSDKManager
 
-## 🚀 最佳实践
+全局 SDK 管理器，提供单例访问。
 
-### 1. 始终使用 DomainService
+#### 初始化
 
 ```dart
-// ✅ 好
-final plans = await XBoardDomainService.getPlans();
+// 从配置初始化（推荐）
+await PanelSDKManager.initFromConfig();
 
-// ❌ 差
-final sdk = XBoardClient.instance.sdk;
-final plans = await sdk.plan.fetchPlans();
+// 手动初始化
+await PanelSDKManager.init(
+  panelType: 'xboard',
+  baseUrl: 'https://api.example.com',
+  config: {
+    'userAgent': 'MyApp/1.0',
+    'timeout': Duration(seconds: 30),
+  },
+);
 ```
 
-### 2. 使用类型别名保持兼容性
+#### 属性
 
 ```dart
-// 旧代码可以继续使用
-UserInfoData userInfo = await XBoardDomainService.getUserInfo();
+// 当前面板类型
+String? panelType = PanelSDKManager.currentPanelType;
 
-// 新代码推荐直接使用 SDK 类型
-UserInfo userInfo = await XBoardDomainService.getUserInfo();
+// 是否已初始化
+bool initialized = PanelSDKManager.isInitialized;
+
+// 是否已认证
+bool authenticated = PanelSDKManager.isAuthenticated;
 ```
 
-### 3. 错误处理
+#### 方法
+
+```dart
+// 获取 SDK 实例
+PanelSDKInterface sdk = PanelSDKManager.instance;
+
+// 切换面板
+await PanelSDKManager.switchPanel(
+  panelType: 'v2board',
+  baseUrl: 'https://new-panel.com',
+);
+
+// 释放资源
+PanelSDKManager.dispose();
+```
+
+### PanelSDKInterface
+
+统一的 SDK 接口，所有面板都实现此接口。
+
+#### 认证相关
+
+```dart
+// 登录
+bool success = await sdk.login(
+  email: 'user@example.com',
+  password: 'password',
+);
+
+// 登出
+await sdk.logout();
+
+// Token 管理
+await sdk.saveToken('your-token');
+String? token = await sdk.getToken();
+await sdk.clearToken();
+bool hasToken = await sdk.hasToken();
+```
+
+#### 用户相关
+
+```dart
+// 获取用户信息
+Map<String, dynamic>? userInfo = await sdk.getUserInfo();
+
+// 获取订阅链接
+String? subscriptionUrl = await sdk.getSubscriptionUrl();
+```
+
+#### 套餐和订单
+
+```dart
+// 获取套餐列表
+List<Map<String, dynamic>> plans = await sdk.getPlans();
+
+// 获取订单列表
+List<Map<String, dynamic>> orders = await sdk.getOrders();
+```
+
+#### 其他功能
+
+```dart
+// 获取公告列表
+List<Map<String, dynamic>> notices = await sdk.getNotices();
+
+// 获取邀请信息
+Map<String, dynamic>? inviteInfo = await sdk.getInviteInfo();
+```
+
+## 切换面板
+
+### 运行时切换
+
+```dart
+// 从 XBoard 切换到 V2Board
+await PanelSDKManager.switchPanel(
+  panelType: 'v2board',
+  baseUrl: 'https://v2board-panel.com',
+);
+
+// 现在所有调用都会使用 V2Board SDK
+final userInfo = await PanelSDKManager.instance.getUserInfo();
+```
+
+### 配置文件切换
+
+修改 `xboard.config.yaml`:
+
+```yaml
+xboard:
+  panel_type: v2board  # 从 xboard 改为 v2board
+```
+
+然后重新初始化：
+
+```dart
+await PanelSDKManager.initFromConfig();
+```
+
+## 错误处理
 
 ```dart
 try {
-  final userInfo = await XBoardDomainService.getUserInfo();
-  if (userInfo != null) {
-    // 处理用户信息
+  await PanelSDKManager.initFromConfig();
+  
+  final success = await PanelSDKManager.instance.login(
+    email: 'user@example.com',
+    password: 'password',
+  );
+  
+  if (!success) {
+    print('登录失败：用户名或密码错误');
   }
 } catch (e) {
-  // 处理错误
-  print('获取用户信息失败: $e');
+  print('SDK 错误: $e');
 }
 ```
 
-### 4. Provider 中使用
+## 高级用法
+
+### 自定义 Provider
+
+如果需要自定义 SDK 行为，可以实现 `PanelSDKInterface`:
 
 ```dart
-@riverpod
-class UserInfoNotifier extends _$UserInfoNotifier {
+class CustomSDKProvider implements PanelSDKInterface {
   @override
-  Future<UserInfo?> build() async {
-    return await XBoardDomainService.getUserInfo();
+  String get sdkType => 'custom';
+  
+  @override
+  Future<void> initialize({
+    required String baseUrl,
+    Map<String, dynamic>? config,
+  }) async {
+    // 自定义初始化逻辑
   }
-
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      return await XBoardDomainService.getUserInfo();
-    });
-  }
+  
+  // 实现其他方法...
 }
 ```
 
-## 📝 API 分类
+### 直接访问底层 SDK
 
-### 认证相关
-- `login()` - 登录
-- `register()` - 注册
-- `logout()` - 登出
-- `resetPassword()` - 重置密码
-- `sendVerificationCode()` - 发送验证码
-- `isLoggedIn()` - 检查登录状态
+```dart
+// 获取 XBoard SDK 实例（如果当前是 XBoard）
+final provider = PanelSDKFactory.currentProvider as XBoardSDKProvider;
+final xboardSdk = provider._sdk; // 访问底层 XBoardSDK
 
-### 用户相关
-- `getUserInfo()` - 获取用户信息
+// 获取 V2Board 客户端（如果当前是 V2Board）
+final provider = PanelSDKFactory.currentProvider as V2BoardSDKProvider;
+final v2boardClient = provider._client; // 访问底层 V2BoardClient
+```
 
-### 套餐与订阅
-- `getPlans()` - 获取套餐列表
-- `getSubscription()` - 获取订阅信息
+## 架构说明
 
-### 订单相关
-- `createOrder()` - 创建订单
-- `getOrders()` - 获取订单列表
-- `getOrderByTradeNo()` - 根据订单号获取详情
-- `cancelOrder()` - 取消订单
-- `getPaymentMethods()` - 获取支付方式
+```
+lib/xboard/sdk/
+├── interfaces/
+│   └── panel_sdk_interface.dart    # 统一接口定义
+├── providers/
+│   ├── xboard_sdk_provider.dart    # XBoard 适配器
+│   └── v2board_sdk_provider.dart   # V2Board 适配器
+├── panel_sdk_factory.dart          # SDK 工厂
+├── panel_sdk_manager.dart          # 全局管理器
+└── panel_sdk.dart                  # 统一导出
+```
 
-### 支付相关
-- `submitPayment()` - 提交支付
-- `checkPaymentStatus()` - 查询支付状态
-- `checkOrderStatus()` - 检查订单状态
-- `cancelPayment()` - 取消支付
-- `getPaymentHistory()` - 获取支付历史
-- `getPaymentStats()` - 获取支付统计
+### 设计模式
 
-### 邀请佣金
-- `getInviteInfo()` - 获取邀请信息
-- `generateInviteCode()` - 生成邀请码
-- `getCommissionHistory()` - 获取佣金历史
-- `withdrawCommission()` - 提现佣金
-- `transferCommissionToBalance()` - 划转佣金到余额
+- **工厂模式**: `PanelSDKFactory` 根据配置创建对应的 Provider
+- **适配器模式**: 各 Provider 将不同 SDK 适配到统一接口
+- **单例模式**: `PanelSDKManager` 提供全局访问点
+- **策略模式**: 运行时可切换不同的 SDK 实现
 
-### 优惠券
-- `checkCoupon()` - 验证优惠券
+## FAQ
 
-### 工单
-- `getTickets()` - 获取工单列表
-- `createTicket()` - 创建工单
-- `getTicketDetail()` - 获取工单详情
-- `replyTicket()` - 回复工单
-- `closeTicket()` - 关闭工单
+### Q: 如何知道当前使用的是哪个 SDK？
 
-### 公告
-- `getNotices()` - 获取公告列表
+```dart
+String? panelType = PanelSDKManager.currentPanelType;
+print('当前面板类型: $panelType');  // 输出: xboard 或 v2board
+```
 
-### 配置
-- `getConfig()` - 获取应用配置
-- `getAppInfo()` - 获取应用信息
+### Q: 切换面板后需要重新登录吗？
 
-### 工具方法
-- `initialize()` - 初始化服务
-- `dispose()` - 释放资源
-- `getCurrentDomain()` - 获取当前域名
-- `switchToFastestDomain()` - 切换到最快域名
+是的，切换面板会清除当前 SDK 的认证状态，需要重新登录。
 
-## 🔍 常见问题
+### Q: 可以同时使用两个 SDK 吗？
 
-### Q: 为什么要有中间层？
+不推荐。`PanelSDKManager` 设计为单例模式，同一时间只维护一个 SDK 实例。如果需要同时访问两个面板，请直接实例化对应的 SDK。
 
-**A**:
-1. **解耦**：业务代码不直接依赖 SDK 实现
-2. **简化**：隐藏 SDK 的复杂性
-3. **标准化**：统一的调用方式和错误处理
-4. **灵活**：方便未来切换或升级底层 SDK
+### Q: 如何添加新的面板支持？
 
-### Q: 什么时候需要直接访问 SDK？
+1. 创建新的 Provider 类实现 `PanelSDKInterface`
+2. 在 `PanelSDKFactory.createProvider()` 中添加 case 分支
+3. 在配置文件中添加新的面板类型选项
 
-**A**: 通常不需要。如果 `XBoardDomainService` 没有提供你需要的方法，请：
-1. 先检查是否可以添加到 `XBoardDomainService`
-2. 如果是通用功能，应该添加到中间层
-3. 只有在极特殊情况下才考虑绕过中间层
+## License
 
-### Q: 如何扩展新功能？
-
-**A**:
-1. 确认 SDK 支持该功能
-2. 在 `XBoardDomainService` 中添加对应的静态方法
-3. 按照现有模式进行封装（try-catch，返回值处理等）
-4. 更新本文档的 API 分类
-
-## 🔗 相关文档
-
-- [flutter_xboard_sdk 文档](../../../sdk/flutter_xboard_sdk/README.md)
-- [XBoard 配置说明](../config_v2/README.md)
-- [认证功能说明](../features/auth/README.md)
-
-## 📌 维护说明
-
-### 添加新 API 的步骤
-
-1. **确认 SDK 支持**
-   ```dart
-   // 检查 flutter_xboard_sdk 是否有对应 API
-   final result = await XBoardSDK.instance.someApi.someMethod();
-   ```
-
-2. **在 XBoardDomainService 中添加方法**
-   ```dart
-   /// 获取某个数据
-   static Future<SomeData?> getSomeData() async {
-     try {
-       final result = await _sdk.someApi.someMethod();
-       return result.data;
-     } catch (e) {
-       return null; // 或者重新抛出异常，根据业务需求
-     }
-   }
-   ```
-
-3. **添加文档注释**
-   - 说明方法用途
-   - 参数说明
-   - 返回值说明
-   - 使用示例
-
-4. **更新本 README**
-   - 在对应的 API 分类中添加
-   - 如果是新分类，创建新的章节
-
-5. **添加类型别名（如需要）**
-   ```dart
-   typedef SomeData = SomeSDKModel;
-   ```
-
----
-
-**最后更新**: 2025-01-12
-**维护者**: FlClash Team
+MIT License
