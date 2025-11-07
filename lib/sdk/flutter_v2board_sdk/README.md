@@ -49,6 +49,26 @@ dependencies:
     path: lib/sdk/flutter_v2board_sdk
 ```
 
+## 代码生成
+
+本 SDK 使用 [Freezed](https://pub.dev/packages/freezed) 和 [json_serializable](https://pub.dev/packages/json_serializable) 进行代码生成。
+
+### 首次使用或修改模型后，需要运行：
+
+```bash
+cd lib/sdk/flutter_v2board_sdk
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### 开发时自动监听文件变化：
+
+```bash
+dart run build_runner watch --delete-conflicting-outputs
+```
+
+> 💡 **注意**: `*.freezed.dart` 和 `*.g.dart` 文件已被 `.gitignore` 忽略，不会提交到版本控制。每个开发者需要在本地生成这些文件。
+
 ## 快速开始
 
 ### 1. 初始化客户端
