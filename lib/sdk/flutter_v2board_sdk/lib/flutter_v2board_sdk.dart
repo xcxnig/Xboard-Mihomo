@@ -11,8 +11,6 @@ export 'src/api/auth_api.dart';
 export 'src/api/user_api.dart';
 export 'src/api/plan_api.dart';
 export 'src/api/order_api.dart';
-export 'src/api/subscription_api.dart';
-export 'src/api/payment_api.dart';
 export 'src/api/coupon_api.dart';
 export 'src/api/invite_api.dart';
 export 'src/api/notice_api.dart';
