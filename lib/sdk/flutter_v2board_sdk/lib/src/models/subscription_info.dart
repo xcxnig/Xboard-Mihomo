@@ -1,24 +1,16 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'subscription_info.freezed.dart';
+part 'subscription_info.g.dart';
+
 /// 订阅信息数据模型
-class SubscriptionInfo {
-  final String? subscribeUrl;
-  final String? token;
+@freezed
+class SubscriptionInfo with _$SubscriptionInfo {
+  const factory SubscriptionInfo({
+    @JsonKey(name: 'subscribe_url') String? subscribeUrl,
+    String? token,
+  }) = _SubscriptionInfo;
   
-  SubscriptionInfo({
-    this.subscribeUrl,
-    this.token,
-  });
-  
-  factory SubscriptionInfo.fromJson(Map<String, dynamic> json) {
-    return SubscriptionInfo(
-      subscribeUrl: json['subscribe_url'] as String?,
-      token: json['token'] as String?,
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'subscribe_url': subscribeUrl,
-      'token': token,
-    };
-  }
+  factory SubscriptionInfo.fromJson(Map<String, dynamic> json) => 
+      _$SubscriptionInfoFromJson(json);
 }

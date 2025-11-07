@@ -1,98 +1,37 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'plan.freezed.dart';
+part 'plan.g.dart';
+
 /// 套餐计划数据模型
-class Plan {
-  final int id;
-  final int? groupId;
-  final int? transferEnable;
-  final String? name;
-  final int? show;
-  final int? sort;
-  final int? renew;
-  final String? content;
-  final int? monthPrice;
-  final int? quarterPrice;
-  final int? halfYearPrice;
-  final int? yearPrice;
-  final int? twoYearPrice;
-  final int? threeYearPrice;
-  final int? onetimePrice;
-  final int? resetPrice;
-  final int? resetTrafficMethod;
-  final int? capacityLimit;
-  final int? speedLimit;
-  final int? deviceLimit;
+@freezed
+class Plan with _$Plan {
+  const Plan._();
   
-  Plan({
-    required this.id,
-    this.groupId,
-    this.transferEnable,
-    this.name,
-    this.show,
-    this.sort,
-    this.renew,
-    this.content,
-    this.monthPrice,
-    this.quarterPrice,
-    this.halfYearPrice,
-    this.yearPrice,
-    this.twoYearPrice,
-    this.threeYearPrice,
-    this.onetimePrice,
-    this.resetPrice,
-    this.resetTrafficMethod,
-    this.capacityLimit,
-    this.speedLimit,
-    this.deviceLimit,
-  });
+  const factory Plan({
+    required int id,
+    @JsonKey(name: 'group_id') int? groupId,
+    @JsonKey(name: 'transfer_enable') int? transferEnable,
+    String? name,
+    int? show,
+    int? sort,
+    int? renew,
+    String? content,
+    @JsonKey(name: 'month_price') int? monthPrice,
+    @JsonKey(name: 'quarter_price') int? quarterPrice,
+    @JsonKey(name: 'half_year_price') int? halfYearPrice,
+    @JsonKey(name: 'year_price') int? yearPrice,
+    @JsonKey(name: 'two_year_price') int? twoYearPrice,
+    @JsonKey(name: 'three_year_price') int? threeYearPrice,
+    @JsonKey(name: 'onetime_price') int? onetimePrice,
+    @JsonKey(name: 'reset_price') int? resetPrice,
+    @JsonKey(name: 'reset_traffic_method') int? resetTrafficMethod,
+    @JsonKey(name: 'capacity_limit') int? capacityLimit,
+    @JsonKey(name: 'speed_limit') int? speedLimit,
+    @JsonKey(name: 'device_limit') int? deviceLimit,
+  }) = _Plan;
   
-  factory Plan.fromJson(Map<String, dynamic> json) {
-    return Plan(
-      id: json['id'] as int,
-      groupId: json['group_id'] as int?,
-      transferEnable: json['transfer_enable'] as int?,
-      name: json['name'] as String?,
-      show: json['show'] as int?,
-      sort: json['sort'] as int?,
-      renew: json['renew'] as int?,
-      content: json['content'] as String?,
-      monthPrice: json['month_price'] as int?,
-      quarterPrice: json['quarter_price'] as int?,
-      halfYearPrice: json['half_year_price'] as int?,
-      yearPrice: json['year_price'] as int?,
-      twoYearPrice: json['two_year_price'] as int?,
-      threeYearPrice: json['three_year_price'] as int?,
-      onetimePrice: json['onetime_price'] as int?,
-      resetPrice: json['reset_price'] as int?,
-      resetTrafficMethod: json['reset_traffic_method'] as int?,
-      capacityLimit: json['capacity_limit'] as int?,
-      speedLimit: json['speed_limit'] as int?,
-      deviceLimit: json['device_limit'] as int?,
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'group_id': groupId,
-      'transfer_enable': transferEnable,
-      'name': name,
-      'show': show,
-      'sort': sort,
-      'renew': renew,
-      'content': content,
-      'month_price': monthPrice,
-      'quarter_price': quarterPrice,
-      'half_year_price': halfYearPrice,
-      'year_price': yearPrice,
-      'two_year_price': twoYearPrice,
-      'three_year_price': threeYearPrice,
-      'onetime_price': onetimePrice,
-      'reset_price': resetPrice,
-      'reset_traffic_method': resetTrafficMethod,
-      'capacity_limit': capacityLimit,
-      'speed_limit': speedLimit,
-      'device_limit': deviceLimit,
-    };
-  }
+  factory Plan.fromJson(Map<String, dynamic> json) => _$PlanFromJson(json);
   
   /// 获取指定周期的价格
   int? getPriceForPeriod(String period) {

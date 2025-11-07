@@ -1,50 +1,26 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'payment_method.freezed.dart';
+part 'payment_method.g.dart';
+
 /// 支付方式数据模型
-class PaymentMethod {
-  final int id;
-  final String? name;
-  final String? payment;
-  final String? icon;
-  final int? show;
-  final String? config;
-  final int? handlingFeeFixed;
-  final double? handlingFeePercent;
+@freezed
+class PaymentMethod with _$PaymentMethod {
+  const PaymentMethod._();
   
-  PaymentMethod({
-    required this.id,
-    this.name,
-    this.payment,
-    this.icon,
-    this.show,
-    this.config,
-    this.handlingFeeFixed,
-    this.handlingFeePercent,
-  });
+  const factory PaymentMethod({
+    required int id,
+    String? name,
+    String? payment,
+    String? icon,
+    int? show,
+    String? config,
+    @JsonKey(name: 'handling_fee_fixed') int? handlingFeeFixed,
+    @JsonKey(name: 'handling_fee_percent') double? handlingFeePercent,
+  }) = _PaymentMethod;
   
-  factory PaymentMethod.fromJson(Map<String, dynamic> json) {
-    return PaymentMethod(
-      id: json['id'] as int,
-      name: json['name'] as String?,
-      payment: json['payment'] as String?,
-      icon: json['icon'] as String?,
-      show: json['show'] as int?,
-      config: json['config'] as String?,
-      handlingFeeFixed: json['handling_fee_fixed'] as int?,
-      handlingFeePercent: (json['handling_fee_percent'] as num?)?.toDouble(),
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'payment': payment,
-      'icon': icon,
-      'show': show,
-      'config': config,
-      'handling_fee_fixed': handlingFeeFixed,
-      'handling_fee_percent': handlingFeePercent,
-    };
-  }
+  factory PaymentMethod.fromJson(Map<String, dynamic> json) => 
+      _$PaymentMethodFromJson(json);
   
   /// 是否显示
   bool get isVisible => show == 1;

@@ -1,102 +1,41 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'user_info.freezed.dart';
+part 'user_info.g.dart';
+
 /// 用户信息数据模型
-class UserInfo {
-  final String email;
-  final int? transferEnable;
-  final int? deviceLimit;
-  final int? lastLoginAt;
-  final int? createdAt;
-  final int? banned;
-  final int? autoRenewal;
-  final int? remindExpire;
-  final int? remindTraffic;
-  final int? expiredAt;
-  final int? balance;
-  final int? commissionBalance;
-  final int? planId;
-  final int? discount;
-  final int? commissionRate;
-  final int? telegramId;
-  final String? uuid;
-  final String? avatarUrl;
+@freezed
+class UserInfo with _$UserInfo {
+  const UserInfo._();
   
-  /// 已上传流量 (bytes)
-  final int? u;
+  const factory UserInfo({
+    required String email,
+    @JsonKey(name: 'transfer_enable') int? transferEnable,
+    @JsonKey(name: 'device_limit') int? deviceLimit,
+    @JsonKey(name: 'last_login_at') int? lastLoginAt,
+    @JsonKey(name: 'created_at') int? createdAt,
+    int? banned,
+    @JsonKey(name: 'auto_renewal') int? autoRenewal,
+    @JsonKey(name: 'remind_expire') int? remindExpire,
+    @JsonKey(name: 'remind_traffic') int? remindTraffic,
+    @JsonKey(name: 'expired_at') int? expiredAt,
+    int? balance,
+    @JsonKey(name: 'commission_balance') int? commissionBalance,
+    @JsonKey(name: 'plan_id') int? planId,
+    int? discount,
+    @JsonKey(name: 'commission_rate') int? commissionRate,
+    @JsonKey(name: 'telegram_id') int? telegramId,
+    String? uuid,
+    @JsonKey(name: 'avatar_url') String? avatarUrl,
+    
+    /// 已上传流量 (bytes)
+    int? u,
+    
+    /// 已下载流量 (bytes)
+    int? d,
+  }) = _UserInfo;
   
-  /// 已下载流量 (bytes)
-  final int? d;
-  
-  UserInfo({
-    required this.email,
-    this.transferEnable,
-    this.deviceLimit,
-    this.lastLoginAt,
-    this.createdAt,
-    this.banned,
-    this.autoRenewal,
-    this.remindExpire,
-    this.remindTraffic,
-    this.expiredAt,
-    this.balance,
-    this.commissionBalance,
-    this.planId,
-    this.discount,
-    this.commissionRate,
-    this.telegramId,
-    this.uuid,
-    this.avatarUrl,
-    this.u,
-    this.d,
-  });
-  
-  factory UserInfo.fromJson(Map<String, dynamic> json) {
-    return UserInfo(
-      email: json['email'] as String,
-      transferEnable: json['transfer_enable'] as int?,
-      deviceLimit: json['device_limit'] as int?,
-      lastLoginAt: json['last_login_at'] as int?,
-      createdAt: json['created_at'] as int?,
-      banned: json['banned'] as int?,
-      autoRenewal: json['auto_renewal'] as int?,
-      remindExpire: json['remind_expire'] as int?,
-      remindTraffic: json['remind_traffic'] as int?,
-      expiredAt: json['expired_at'] as int?,
-      balance: json['balance'] as int?,
-      commissionBalance: json['commission_balance'] as int?,
-      planId: json['plan_id'] as int?,
-      discount: json['discount'] as int?,
-      commissionRate: json['commission_rate'] as int?,
-      telegramId: json['telegram_id'] as int?,
-      uuid: json['uuid'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
-      u: json['u'] as int?,
-      d: json['d'] as int?,
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'transfer_enable': transferEnable,
-      'device_limit': deviceLimit,
-      'last_login_at': lastLoginAt,
-      'created_at': createdAt,
-      'banned': banned,
-      'auto_renewal': autoRenewal,
-      'remind_expire': remindExpire,
-      'remind_traffic': remindTraffic,
-      'expired_at': expiredAt,
-      'balance': balance,
-      'commission_balance': commissionBalance,
-      'plan_id': planId,
-      'discount': discount,
-      'commission_rate': commissionRate,
-      'telegram_id': telegramId,
-      'uuid': uuid,
-      'avatar_url': avatarUrl,
-      'u': u,
-      'd': d,
-    };
-  }
+  factory UserInfo.fromJson(Map<String, dynamic> json) => _$UserInfoFromJson(json);
   
   /// 是否已过期
   bool get isExpired {

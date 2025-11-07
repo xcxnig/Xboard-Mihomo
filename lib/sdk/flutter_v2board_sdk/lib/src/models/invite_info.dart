@@ -1,115 +1,51 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'invite_info.freezed.dart';
+part 'invite_info.g.dart';
+
 /// 邀请信息数据模型
-class InviteInfo {
-  final List<InviteCode>? codes;
-  final List<InviteStat>? stat;
+@freezed
+class InviteInfo with _$InviteInfo {
+  const factory InviteInfo({
+    List<InviteCode>? codes,
+    List<InviteStat>? stat,
+  }) = _InviteInfo;
   
-  InviteInfo({
-    this.codes,
-    this.stat,
-  });
-  
-  factory InviteInfo.fromJson(Map<String, dynamic> json) {
-    List<InviteCode>? codes;
-    if (json['codes'] != null) {
-      codes = (json['codes'] as List)
-          .map((item) => InviteCode.fromJson(item))
-          .toList();
-    }
-    
-    List<InviteStat>? stat;
-    if (json['stat'] != null) {
-      stat = (json['stat'] as List)
-          .map((item) => InviteStat.fromJson(item))
-          .toList();
-    }
-    
-    return InviteInfo(
-      codes: codes,
-      stat: stat,
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'codes': codes?.map((code) => code.toJson()).toList(),
-      'stat': stat?.map((s) => s.toJson()).toList(),
-    };
-  }
+  factory InviteInfo.fromJson(Map<String, dynamic> json) => 
+      _$InviteInfoFromJson(json);
 }
 
 /// 邀请码数据模型
-class InviteCode {
-  final int? id;
-  final int? userId;
-  final String? code;
-  final int? status;
-  final int? createdAt;
-  final int? updatedAt;
+@freezed
+class InviteCode with _$InviteCode {
+  const InviteCode._();
   
-  InviteCode({
-    this.id,
-    this.userId,
-    this.code,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-  });
+  const factory InviteCode({
+    int? id,
+    @JsonKey(name: 'user_id') int? userId,
+    String? code,
+    int? status,
+    @JsonKey(name: 'created_at') int? createdAt,
+    @JsonKey(name: 'updated_at') int? updatedAt,
+  }) = _InviteCode;
   
-  factory InviteCode.fromJson(Map<String, dynamic> json) {
-    return InviteCode(
-      id: json['id'] as int?,
-      userId: json['user_id'] as int?,
-      code: json['code'] as String?,
-      status: json['status'] as int?,
-      createdAt: json['created_at'] as int?,
-      updatedAt: json['updated_at'] as int?,
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'code': code,
-      'status': status,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-    };
-  }
+  factory InviteCode.fromJson(Map<String, dynamic> json) => 
+      _$InviteCodeFromJson(json);
   
   /// 是否可用
   bool get isAvailable => status == 0;
 }
 
 /// 邀请统计数据模型
-class InviteStat {
-  final int? registerCount;
-  final int? commissionRate;
-  final int? commissionBalance;
-  final int? commissionPendingBalance;
+@freezed
+class InviteStat with _$InviteStat {
+  const factory InviteStat({
+    @JsonKey(name: 'register_count') int? registerCount,
+    @JsonKey(name: 'commission_rate') int? commissionRate,
+    @JsonKey(name: 'commission_balance') int? commissionBalance,
+    @JsonKey(name: 'commission_pending_balance') int? commissionPendingBalance,
+  }) = _InviteStat;
   
-  InviteStat({
-    this.registerCount,
-    this.commissionRate,
-    this.commissionBalance,
-    this.commissionPendingBalance,
-  });
-  
-  factory InviteStat.fromJson(Map<String, dynamic> json) {
-    return InviteStat(
-      registerCount: json['register_count'] as int?,
-      commissionRate: json['commission_rate'] as int?,
-      commissionBalance: json['commission_balance'] as int?,
-      commissionPendingBalance: json['commission_pending_balance'] as int?,
-    );
-  }
-  
-  Map<String, dynamic> toJson() {
-    return {
-      'register_count': registerCount,
-      'commission_rate': commissionRate,
-      'commission_balance': commissionBalance,
-      'commission_pending_balance': commissionPendingBalance,
-    };
-  }
+  factory InviteStat.fromJson(Map<String, dynamic> json) => 
+      _$InviteStatFromJson(json);
 }
